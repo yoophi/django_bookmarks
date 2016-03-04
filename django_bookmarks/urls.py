@@ -1,10 +1,9 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 
-urlpatterns = [
-    # Examples:
-    # url(r'^$', 'django_bookmarks.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+from bookmarks.views import main_page
 
+urlpatterns = [
+    url(r'^$', main_page),
     url(r'^admin/', include(admin.site.urls)),
 ]
