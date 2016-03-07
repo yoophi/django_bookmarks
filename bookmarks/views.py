@@ -1,16 +1,15 @@
 # -*- coding: utf8 -*-
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.template import Context
-from django.template.loader import get_template
+from django.template import RequestContext
 
 
 def main_page(request):
     return render_to_response(
         'main_page.html',
-        {'user': request.user}
+        RequestContext(request)
     )
 
 
@@ -21,13 +20,11 @@ def user_page(request, username):
         raise Http404('사용자를 찾을 수 없습니다')
 
     bookmarks = user.bookmark_set.all()
-    template = get_template('user_page.html')
-    variables = Context({
+    variables = RequestContext(request, {
         'username': username,
         'bookmarks': bookmarks,
     })
-    output = template.render(variables)
-    return HttpResponse(output)
+    return render_to_response('user_page.html', variables)
 
 
 def logout_page(request):
