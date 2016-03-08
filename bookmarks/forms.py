@@ -55,3 +55,10 @@ class BookmarkSaveForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={'size': 64})
     )
+
+
+class SearchForm(forms.Form):
+    query = forms.CharField(
+        label='검색어를 입력하세요',
+        widget=forms.TextInput(attrs={'size': 32})
+    )
