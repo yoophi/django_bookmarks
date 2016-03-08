@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -53,6 +54,7 @@ def register_page(request):
     return render_to_response('registration/register.html', variables)
 
 
+@login_required(login_url='/login/')
 def bookmark_save_page(request):
     if request.method == 'POST':
         form = BookmarkSaveForm(request.POST)
@@ -62,7 +64,7 @@ def bookmark_save_page(request):
                 url=form.cleaned_data['url']
             )
 
-            # 북마크가 있으면 가져오고 으ㅓ으면 새로 저장합니다.
+            # 북마크가 있으면 가져오고 없으면 새로 저장합니다.
             bookmark, created = Bookmark.objects.get_or_create(
                 user=request.user,
                 link=link
