@@ -5,13 +5,16 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from bookmarks.views import main_page, user_page, logout_page, register_page, bookmark_save_page
+from bookmarks.views import main_page, user_page, logout_page, register_page, bookmark_save_page, tag_page, \
+    tag_cloud_page
 
 site_media = os.path.join(os.path.dirname(__file__), 'site_media')
 urlpatterns = [
     # 북마크 조회
     url(r'^$', main_page),
     url(r'^user/(\w+)', user_page),
+    url(r'^tag/([^\s]+)/$', tag_page),
+    url(r'^tag/$', tag_cloud_page),
 
     # 세션 관리
     url(r'^login/$', 'django.contrib.auth.views.login'),
