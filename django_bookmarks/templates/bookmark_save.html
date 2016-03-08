@@ -2,9 +2,5 @@
 {% block title %}북마크를 저장하세요.{% endblock %}
 {% block head %}북마크를 저장하세요.{% endblock %}
 {% block content %}
-<form method="post" action=".">
-{% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="저장" />
-</form>
+{% include "bookmark_save_form.html" %}
 {% endblock %}
