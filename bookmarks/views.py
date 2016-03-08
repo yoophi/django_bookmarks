@@ -2,6 +2,7 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -23,7 +24,8 @@ def user_page(request, username):
     variables = RequestContext(request, {
         'username': username,
         'bookmarks': bookmarks,
-        'show_tags': True,
+        'show_edit': True,
+        'show_tags': username == request.user.username,
     })
     return render_to_response('user_page.html', variables)
 
@@ -57,34 +59,32 @@ def bookmark_save_page(request):
     if request.method == 'POST':
         form = BookmarkSaveForm(request.POST)
         if form.is_valid():
-            # URL이 있으면 가져오고 없으면 새로 저장합니다.
-            link, _ = Link.objects.get_or_create(
-                url=form.cleaned_data['url']
-            )
-
-            # 북마크가 있으면 가져오고 없으면 새로 저장합니다.
-            bookmark, created = Bookmark.objects.get_or_create(
-                user=request.user,
-                link=link
-            )
-
-            # 북마크 제목을 수정합니다.
-            bookmark.title = form.cleaned_data['title']
-
-            # 북마크를 수정한 경우에는 이전에 입력된 모든 태그를 지웁니다
-            if not created:
-                bookmark.tag_set.clear()
-
-            # 태그 목록을 새로 만듭니다.
-            tag_names = form.cleaned_data['tags'].split()
-            for tag_name in tag_names:
-                tag, _ = Tag.objects.get_or_create(name=tag_name)
-                bookmark.tag_set.add(tag)
-
-            bookmark.save()
+            bookmark = _bookmark_save(request, form)
             return HttpResponseRedirect(
                 '/user/%s/' % request.user.username
             )
+    elif request.GET.has_key('url'):
+        url = request.GET['url']
+        title = ''
+        tags = ''
+        try:
+            link = Link.objects.get(url=url)
+            bookmark = Bookmark.objects.get(
+                link=link,
+                user=request.user,
+            )
+            title = bookmark.title
+            tags = ' '.join(
+                [tag.name for tag in bookmark.tag_set.all()]
+            )
+        except ObjectDoesNotExist:
+            pass
+        
+        form = BookmarkSaveForm({
+            'url': url,
+            'title': title,
+            'tags': tags,
+        })
     else:
         form = BookmarkSaveForm()
 
@@ -156,3 +156,30 @@ def search_page(request):
     else:
         return render_to_response('search.html', variables)
 
+
+def _bookmark_save(request, form):
+    # 링크를 새로 만들거나 가져옵니다.
+    link, _ = Link.objects.get_or_create(url=form.cleaned_data['url'])
+
+    # 북마크를 새로 만들거나 가져옵니다.
+    bookmark, created = Bookmark.objects.get_or_create(
+        user=request.user,
+        link=link,
+    )
+
+    # 북마크 제목을 수정합니다.
+    bookmark.title = form.cleaned_data['title']
+
+    # 북마크가 수정된 경우 예전 태그들을 제거합니다.
+    if not created:
+        bookmark.tag_set.clear()
+
+    # 새로운 태그를 입력합니다.
+    tag_names = form.cleaned_data['tags'].split()
+    for tag_name in tag_names:
+        tag, _ = Tag.objects.get_or_create(name=tag_name)
+        bookmark.tag_set.add(tag)
+
+    # 북마크를 저장하고 다시 북마크를 반환합니다
+    bookmark.save()
+    return bookmark
