@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}북마크: {{ shared_bookmark.bookmark.title | escape }}{% endblock %}
+{% block head %}
+    <a href="/vote/?id={{ shared_bookmark.id }}" class="vote">[+]</a>
+    <a href="{{ shared_bookmark.bookmark.link.url }}" class="title">북마크: {{ shared_bookmark.bookmark.title | escape }}</a>
+{% endblock %}
+{% block content %}
+    추가한 사용자
+    <a href="/user/{{ shared_bookmark.bookmark.user.username }}" class="username">{{ shared_bookmark.bookmark.user.username }}</a> |
+    <span class="vote-count">투표: {{ shared_bookmark.votes }}</span>
+{% endblock %}

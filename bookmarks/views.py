@@ -252,3 +252,14 @@ def popular_page(request):
     })
 
     return render_to_response('popular_page.html', variables)
+
+
+def bookmark_page(request, bookmark_id):
+    shared_bookmark = get_object_or_404(
+        SharedBookmark,
+        id=bookmark_id
+    )
+    variables = RequestContext(request, {
+        'shared_bookmark': shared_bookmark
+    })
+    return render_to_response('bookmark_page.html', variables)

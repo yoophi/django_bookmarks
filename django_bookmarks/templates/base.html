@@ -1,8 +1,10 @@
+{% load staticfiles %}
+
 <html>
 <head>
     <title>장고 북마크 | {% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="/site_media/style.css" type="text/css"/>
-    <script type="text/javascript" src="/site_media/jquery.js"></script>
+    <link rel="stylesheet" href="{% static "style.css" %}" type="text/css"/>
+    <script type="text/javascript" src="{% static "jquery.js" %}"></script>
     {% block external %}{% endblock %}
 </head>
 <body>
