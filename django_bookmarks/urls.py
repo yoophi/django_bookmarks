@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 
 from bookmarks.views import main_page, user_page, logout_page, register_page, bookmark_save_page, tag_page, \
-    tag_cloud_page, search_page
+    tag_cloud_page, search_page, ajax_tag_autocomplete
 
 site_media = os.path.join(os.path.dirname(__file__), 'site_media')
 urlpatterns = [
@@ -31,6 +31,9 @@ urlpatterns = [
 
     # 계정 관리
     url(r'^save/$', bookmark_save_page),
+
+    # AJAX
+    url(r'^ajax/tag/autocomplete/$', ajax_tag_autocomplete),
 
     # 관리 페이지
     url(r'^admin/', include(admin.site.urls)),
