@@ -55,6 +55,9 @@ class BookmarkSaveForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={'size': 64})
     )
+    share = forms.BooleanField(
+        label='첫 페이지에서 공유합니다.',
+    )
 
 
 class SearchForm(forms.Form):

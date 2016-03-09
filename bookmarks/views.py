@@ -8,14 +8,15 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 
 from bookmarks.forms import RegistrationForm, BookmarkSaveForm, SearchForm
-from bookmarks.models import Link, Bookmark, Tag
+from bookmarks.models import Link, Bookmark, Tag, SharedBookmark
 
 
 def main_page(request):
-    return render_to_response(
-        'main_page.html',
-        RequestContext(request)
-    )
+    shared_bookmarks = SharedBookmark.objects.order_by('-date')[:10]
+    variables = RequestContext(request, {
+        'shared_bookmarks': shared_bookmarks
+    })
+    return render_to_response('main_page.html', variables )
 
 
 def user_page(request, username):
@@ -196,6 +197,13 @@ def _bookmark_save(request, form):
     for tag_name in tag_names:
         tag, _ = Tag.objects.get_or_create(name=tag_name)
         bookmark.tag_set.add(tag)
+
+    # 첫 페이지에서 공유하도록 설정합니다
+    if form.cleaned_data['share']:
+        shared_bookmark, created = SharedBookmark.objects.get_or_create(bookmark=bookmark)
+        if created:
+            shared_bookmark.users_voted.add(request.user)
+            shared_bookmark.save()
 
     # 북마크를 저장하고 다시 북마크를 반환합니다
     bookmark.save()
