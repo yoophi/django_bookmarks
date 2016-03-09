@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
     # 댓글
-    # (r'^comments/', include('django_comments.urls')),
+    url(r'^comments/', include('django_comments.urls')),
+
 ]
 

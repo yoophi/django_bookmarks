@@ -42,6 +42,8 @@ INSTALLED_APPS = (
     'bookmarks',
 )
 
+SITE_ID = 1000
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
