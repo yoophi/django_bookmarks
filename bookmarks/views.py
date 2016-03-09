@@ -57,7 +57,7 @@ def register_page(request):
 
 @login_required(login_url='/login/')
 def bookmark_save_page(request):
-    ajax = request.GET.has_key('ajax')
+    ajax = 'ajax' in request.GET
     if request.method == 'POST':
         form = BookmarkSaveForm(request.POST)
         if form.is_valid():
@@ -77,7 +77,7 @@ def bookmark_save_page(request):
             if ajax:
                 return HttpResponse('failure')
 
-    elif request.GET.has_key('url'):
+    elif 'url' in request.GET:
         url = request.GET['url']
         title = ''
         tags = ''
@@ -154,7 +154,7 @@ def search_page(request):
     form = SearchForm()
     bookmarks = []
     show_results = False
-    if request.GET.has_key('query'):
+    if 'query' in request.GET:
         show_results = True
         query = request.GET['query'].strip()
         if query:
@@ -203,7 +203,7 @@ def _bookmark_save(request, form):
 
 
 def ajax_tag_autocomplete(request):
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         tags = Tag.objects.filter(name__istartswith=request.GET['q'])[:10]
         return HttpResponse('\n'.join([tag.name for tag in tags]))
     return HttpResponse()
