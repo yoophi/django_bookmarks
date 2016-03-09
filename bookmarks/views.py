@@ -1,9 +1,10 @@
 # -*- coding: utf8 -*-
+from datetime import timedelta, datetime
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 
@@ -16,7 +17,7 @@ def main_page(request):
     variables = RequestContext(request, {
         'shared_bookmarks': shared_bookmarks
     })
-    return render_to_response('main_page.html', variables )
+    return render_to_response('main_page.html', variables)
 
 
 def user_page(request, username):
@@ -215,3 +216,39 @@ def ajax_tag_autocomplete(request):
         tags = Tag.objects.filter(name__istartswith=request.GET['q'])[:10]
         return HttpResponse('\n'.join([tag.name for tag in tags]))
     return HttpResponse()
+
+
+@login_required(login_url='/login/')
+def bookmark_vote_page(request):
+    if 'id' in request.GET:
+        try:
+            id = request.GET['id']
+            shared_bookmark = SharedBookmark.objects.get(id=id)
+            user_voted = shared_bookmark.users_voted.filter(
+                username=request.user.username
+            )
+            if not user_voted:
+                shared_bookmark.votes += 1
+                shared_bookmark.users_voted.add(request.user)
+                shared_bookmark.save()
+        except ObjectDoesNotExist:
+            raise Http404('북마크를 찾을 수 없습니다.')
+
+    if 'HTTP_REFERER' in request.META:
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    return HttpResponseRedirect('/')
+
+
+def popular_page(request):
+    today = datetime.today()
+    yesterday = today - timedelta(1)
+    shared_bookmarks = SharedBookmark.objects.filter(
+        date__gt=yesterday
+    )
+    shared_bookmarks = shared_bookmarks.order_by('-votes')[:10]
+    variables = RequestContext(request, {
+        'shared_bookmarks': shared_bookmarks
+    })
+
+    return render_to_response('popular_page.html', variables)
