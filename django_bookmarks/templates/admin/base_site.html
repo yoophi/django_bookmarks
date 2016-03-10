@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans '장고 북마크 사이트 관리' %}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{% trans '장고 북마크 사이트 관리' %}</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

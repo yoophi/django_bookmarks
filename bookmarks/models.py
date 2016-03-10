@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -34,3 +35,16 @@ class SharedBookmark(models.Model):
 
     def __unicode__(self):
         return '%s, %s' % (self.bookmark, self.votes,)
+
+
+class AdminBookmark(admin.ModelAdmin):
+    list_display = ('title', 'link', 'user', )
+    list_filter = ('user', )
+    ordering = ('title', )
+    search_fields = ('title', )
+
+
+admin.site.register(Bookmark, AdminBookmark, )
+admin.site.register(Link, )
+admin.site.register(Tag, )
+admin.site.register(SharedBookmark, )
