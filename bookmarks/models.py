@@ -18,6 +18,9 @@ class Bookmark(models.Model):
     def __unicode__(self):
         return "%s, %s" % (self.user.username, self.link.url,)
 
+    def get_absolute_url(self):
+        return self.link.url
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=64, unique=True)
@@ -31,17 +34,17 @@ class SharedBookmark(models.Model):
     bookmark = models.ForeignKey(Bookmark, unique=True)
     date = models.DateTimeField(auto_now_add=True)
     votes = models.IntegerField(default=1)
-    users_voted = models.ManyToManyField(User)
+    uers_voted = models.ManyToManyField(User)
 
     def __unicode__(self):
         return '%s, %s' % (self.bookmark, self.votes,)
 
 
 class AdminBookmark(admin.ModelAdmin):
-    list_display = ('title', 'link', 'user', )
-    list_filter = ('user', )
-    ordering = ('title', )
-    search_fields = ('title', )
+    list_display = ('title', 'link', 'user',)
+    list_filter = ('user',)
+    ordering = ('title',)
+    search_fields = ('title',)
 
 
 admin.site.register(Bookmark, AdminBookmark, )

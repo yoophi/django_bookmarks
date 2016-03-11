@@ -4,9 +4,11 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 
+from bookmarks.feed import RecentBookmarks
 from bookmarks.views import main_page, user_page, logout_page, register_page, bookmark_save_page, tag_page, \
     tag_cloud_page, search_page, ajax_tag_autocomplete, bookmark_vote_page, popular_page, bookmark_page
 
+feeds = {'recent': RecentBookmarks}
 urlpatterns = [
     # 북마크 조회
     url(r'^$', main_page),
@@ -39,5 +41,7 @@ urlpatterns = [
     # 댓글
     url(r'^comments/', include('django_comments.urls')),
 
+    # Feeds
+    # url(r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.Feed', {'feed_dict': feeds}),
+    url(r'^feeds/(?P<url>.*)/$', RecentBookmarks()),
 ]
-
