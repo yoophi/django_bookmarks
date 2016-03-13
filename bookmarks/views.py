@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -160,8 +161,12 @@ def search_page(request):
         show_results = True
         query = request.GET['query'].strip()
         if query:
+            keywords = query.split()
+            q = Q()
+            for keyword in keywords:
+                q = q & Q(title__icontains=keyword)
             form = SearchForm({'query': query})
-            bookmarks = Bookmark.objects.filter(title__icontains=query)[:10]
+            bookmarks = Bookmark.objects.filter(q)[:10]
 
     variables = RequestContext(request, {
         'bookmarks': bookmarks,
