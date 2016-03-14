@@ -28,6 +28,18 @@
     </li>
     {% endfor %}
 </ul>
+{% if show_paginator %}
+    <div class="paginator">
+    {% if bookmarks.has_previous %}
+        <a href="?page={{ bookmarks.prev_page_number }}">&laquo; 다음 페이지</a>
+    </div>
+    {% endif %}
+    {% if bookmarks.has_next %}
+        <a href="?page={{ bookmarks.next_page_number }}">이전 페이지 &raquo;</a>
+    {% endif %}
+    (페이지 {{ bookmarks.number }} of {{ bookmarks.paginator.num_pages }})
+    </div>
+{% endif %}
 {% else %}
 <p>북마크가 없습니다.</p>
 {% endif %}

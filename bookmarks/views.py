@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
@@ -11,6 +12,8 @@ from django.template import RequestContext
 
 from bookmarks.forms import RegistrationForm, BookmarkSaveForm, SearchForm
 from bookmarks.models import Link, Bookmark, Tag, SharedBookmark
+
+ITEMS_PER_PAGE = 10
 
 
 def main_page(request):
@@ -23,13 +26,25 @@ def main_page(request):
 
 def user_page(request, username):
     user = get_object_or_404(User, username=username)
-    bookmarks = user.bookmark_set.order_by('-id')
+    query_set = user.bookmark_set.order_by('-id')
+    paginator = Paginator(query_set, ITEMS_PER_PAGE) # Show 25 contacts per page
+
+    page = request.GET.get('page')
+    try:
+        bookmarks = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        bookmarks = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        bookmarks = paginator.page(paginator.num_pages)
 
     variables = RequestContext(request, {
         'username': username,
         'bookmarks': bookmarks,
         'show_edit': True,
         'show_tags': username == request.user.username,
+        'show_paginator': paginator.num_pages > 1,
     })
     return render_to_response('user_page.html', variables)
 
