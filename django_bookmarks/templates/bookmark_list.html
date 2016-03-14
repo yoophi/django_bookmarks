@@ -31,11 +31,10 @@
 {% if show_paginator %}
     <div class="paginator">
     {% if bookmarks.has_previous %}
-        <a href="?page={{ bookmarks.prev_page_number }}">&laquo; 다음 페이지</a>
-    </div>
+        <a href="?page={{ bookmarks.prev_page_number }}">&laquo; 이전 페이지</a>
     {% endif %}
     {% if bookmarks.has_next %}
-        <a href="?page={{ bookmarks.next_page_number }}">이전 페이지 &raquo;</a>
+        <a href="?page={{ bookmarks.next_page_number }}">다음 페이지 &raquo;</a>
     {% endif %}
     (페이지 {{ bookmarks.number }} of {{ bookmarks.paginator.num_pages }})
     </div>
