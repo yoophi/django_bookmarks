@@ -6,7 +6,8 @@ from django.contrib.auth import views as auth_views
 
 from bookmarks.feed import RecentBookmarks, UserBookmarks
 from bookmarks.views import main_page, user_page, logout_page, register_page, bookmark_save_page, tag_page, \
-    tag_cloud_page, search_page, ajax_tag_autocomplete, bookmark_vote_page, popular_page, bookmark_page, friends_page
+    tag_cloud_page, search_page, ajax_tag_autocomplete, bookmark_vote_page, popular_page, bookmark_page, friends_page, \
+    friend_add
 
 urlpatterns = [
     # 북마크 조회
@@ -20,6 +21,7 @@ urlpatterns = [
 
     # 친구들
     url(r'^friends/(\w+)/$', friends_page),
+    url(r'^friend/add/$', friend_add),
 
     # 세션 관리
     url(r'^login/$', auth_views.login),

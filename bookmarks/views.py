@@ -11,7 +11,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 
 from bookmarks.forms import RegistrationForm, BookmarkSaveForm, SearchForm
-from bookmarks.models import Link, Bookmark, Tag, SharedBookmark
+from bookmarks.models import Link, Bookmark, Tag, SharedBookmark, Friendship
 
 ITEMS_PER_PAGE = 10
 
@@ -28,6 +28,10 @@ def user_page(request, username):
     user = get_object_or_404(User, username=username)
     query_set = user.bookmark_set.order_by('-id')
     paginator = Paginator(query_set, ITEMS_PER_PAGE) # Show 25 contacts per page
+    is_friend = Friendship.objects.filter(
+        from_friend=request.user,
+        to_friend=user
+    )
 
     page = request.GET.get('page')
     try:
@@ -45,6 +49,7 @@ def user_page(request, username):
         'show_edit': True,
         'show_tags': username == request.user.username,
         'show_paginator': paginator.num_pages > 1,
+        'is_friend': is_friend,
     })
     return render_to_response('user_page.html', variables)
 
@@ -287,7 +292,7 @@ def bookmark_page(request, bookmark_id):
 
 def friends_page(request, username):
     user = get_object_or_404(User, username=username)
-    friends = [friendship.to_firend for friendship in user.friend_set.all()]
+    friends = [friendship.to_friend for friendship in user.friend_set.all()]
     friend_bookmarks = Bookmark.objects.filter(user__in=friends).order_by('-id')
     variables = RequestContext(request, {
         'username': username,
@@ -297,3 +302,18 @@ def friends_page(request, username):
         'show_user': True,
     })
     return render_to_response('friends_page.html', variables)
+
+@login_required(login_url='/login/')
+def friend_add(request):
+    if 'username' in request.GET:
+        friend = get_object_or_404(User, username=request.GET['username'])
+        friendship = Friendship(
+            from_friend=request.user,
+            to_friend=friend
+        )
+        friendship.save()
+        return HttpResponseRedirect(
+            '/friends/%s/' % request.user.username
+        )
+    else:
+        raise Http404
