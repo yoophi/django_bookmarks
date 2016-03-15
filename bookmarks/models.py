@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -40,14 +39,19 @@ class SharedBookmark(models.Model):
         return '%s, %s' % (self.bookmark, self.votes,)
 
 
-class AdminBookmark(admin.ModelAdmin):
-    list_display = ('title', 'link', 'user',)
-    list_filter = ('user',)
-    ordering = ('title',)
-    search_fields = ('title',)
+class Friendship(models.Model):
+    from_friend = models.ForeignKey(
+        User, related_name='friend_set'
+    )
+    to_friend = models.ForeignKey(
+        User, related_name='to_friend_set'
+    )
 
+    def __unicode__(self):
+        return '%s, %s' % (
+            self.from_friend.username,
+            self.to_friend.username,
+        )
 
-admin.site.register(Bookmark, AdminBookmark, )
-admin.site.register(Link, )
-admin.site.register(Tag, )
-admin.site.register(SharedBookmark, )
+    class Meta:
+        unique_together = (('to_friend', 'from_friend',),)
