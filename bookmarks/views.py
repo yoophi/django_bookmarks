@@ -9,9 +9,8 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-
-from bookmarks.forms import RegistrationForm, BookmarkSaveForm, SearchForm
-from bookmarks.models import Link, Bookmark, Tag, SharedBookmark, Friendship
+from bookmarks.forms import RegistrationForm, BookmarkSaveForm, SearchForm, FriendInviteForm
+from bookmarks.models import Link, Bookmark, Tag, SharedBookmark, Friendship, Invitation
 
 ITEMS_PER_PAGE = 10
 
@@ -27,7 +26,7 @@ def main_page(request):
 def user_page(request, username):
     user = get_object_or_404(User, username=username)
     query_set = user.bookmark_set.order_by('-id')
-    paginator = Paginator(query_set, ITEMS_PER_PAGE) # Show 25 contacts per page
+    paginator = Paginator(query_set, ITEMS_PER_PAGE)  # Show 25 contacts per page
     is_friend = Friendship.objects.filter(
         from_friend=request.user,
         to_friend=user
@@ -68,6 +67,27 @@ def register_page(request):
                 password=form.cleaned_data['password1'],
                 email=form.cleaned_data['email'],
             )
+            if 'invitation' in request.session:
+                # Retrieve the invitation object.
+                invitation = Invitation.objects.get(id=request.session['invitation'])
+                # Create friendship from user to sender
+                friendship = Friendship(
+                    from_friend=user,
+                    to_friend=invitation.sender
+                )
+                friendship.save()
+
+                # Create friendship from sender to user
+                friendship = Friendship(
+                    from_friend=invitation.sender,
+                    to_friend=user
+                )
+                friendship.save()
+
+                # Delete the invitation from the database and session.
+                invitation.delete()
+                del request.session['invitation']
+
             return HttpResponseRedirect('/register/success/')
     else:
         form = RegistrationForm()
@@ -303,6 +323,7 @@ def friends_page(request, username):
     })
     return render_to_response('friends_page.html', variables)
 
+
 @login_required(login_url='/login/')
 def friend_add(request):
     if 'username' in request.GET:
@@ -317,3 +338,32 @@ def friend_add(request):
         )
     else:
         raise Http404
+
+
+@login_required(login_url='/login/')
+def friend_invite(request):
+    if request.method == 'POST':
+        form = FriendInviteForm(request.POST)
+        if form.is_valid():
+            invitation = Invitation(
+                name=form.cleaned_data['name'],
+                email=form.cleaned_data['email'],
+                code=User.objects.make_random_password(20),
+                sender=request.user,
+            )
+            invitation.save()
+            invitation.send()
+            return HttpResponseRedirect('/friend/invite/')
+    else:
+        form = FriendInviteForm()
+
+    variables = RequestContext(request, {
+        'form': form
+    })
+    return render_to_response('friend_invite.html', variables)
+
+
+def friend_accept(request, code):
+    invitation = get_object_or_404(Invitation, code__exact=code)
+    request.session['invitation'] = invitation.id
+    return HttpResponseRedirect('/register/')

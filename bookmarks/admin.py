@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from bookmarks.models import Bookmark, Link, Tag, SharedBookmark, Friendship
+from bookmarks.models import Bookmark, Link, Tag, SharedBookmark, Friendship, Invitation
 
 
 class AdminBookmark(admin.ModelAdmin):
@@ -16,3 +16,4 @@ admin.site.register(Link, )
 admin.site.register(Tag, )
 admin.site.register(SharedBookmark, )
 admin.site.register(Friendship, )
+admin.site.register(Invitation, )

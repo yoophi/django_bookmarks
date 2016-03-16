@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 """
 Django settings for django_bookmarks project.
 
@@ -107,3 +108,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(os.path.dirname(__file__), 'static'),
 ]
+
+SITE_HOST = '127.0.0.1:8000'
+DEFAULT_FROM_EMAIL = u'장고 북마크 <django.bookmarks@example.com>'
+EMAIL_HOST = 'aspmx.l.google.com'
+EMAIL_PORT = '25'
+EMAIL_HOST_USER = 'yoophi@gmail.com'
+EMAIL_HOST_PASSWORD = ''
