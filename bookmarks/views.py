@@ -3,6 +3,7 @@ from datetime import timedelta, datetime
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
@@ -332,7 +333,15 @@ def friend_add(request):
             from_friend=request.user,
             to_friend=friend
         )
-        friendship.save()
+        try:
+            friendship.save()
+            messages.add_message(request, messages.INFO,
+                                 u'%s를 친구로 추가했습니다.' % friend.username
+                                 )
+        except:
+            messages.add_message(request, messages.INFO,
+                                 u'%s는 이미 친구입니다.' % friend.username
+                                 )
         return HttpResponseRedirect(
             '/friends/%s/' % request.user.username
         )
@@ -352,7 +361,15 @@ def friend_invite(request):
                 sender=request.user,
             )
             invitation.save()
-            invitation.send()
+            try:
+                invitation.send()
+                messages.add_message(request, messages.INFO,
+                                     u'%s에게 초대 메세지를 보냈습니다.' % invitation.email
+                                     )
+            except:
+                request.user.message_set.create(
+                    message=u'초대하는 과정에서 오류가 있었습니다.'
+                )
             return HttpResponseRedirect('/friend/invite/')
     else:
         form = FriendInviteForm()
