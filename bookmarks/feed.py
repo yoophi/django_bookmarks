@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
 from bookmarks.models import Bookmark

@@ -1,8 +1,9 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 import re
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import gettext as _
 
 
 class RegistrationForm(forms.Form):
@@ -68,5 +69,5 @@ class SearchForm(forms.Form):
 
 
 class FriendInviteForm(forms.Form):
-    name = forms.CharField(label=u'친구의 이름')
-    email = forms.EmailField(label=u'친구의 이메일')
+    name = forms.CharField(label=_("Friend's Name"))
+    email = forms.EmailField(label=_("Friend's Email"))

@@ -1,15 +1,18 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 from datetime import timedelta, datetime
+
+from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
+from django.utils.translation import gettext as _
+
 from bookmarks.forms import RegistrationForm, BookmarkSaveForm, SearchForm, FriendInviteForm
 from bookmarks.models import Link, Bookmark, Tag, SharedBookmark, Friendship, Invitation
 
@@ -364,11 +367,11 @@ def friend_invite(request):
             try:
                 invitation.send()
                 messages.add_message(request, messages.INFO,
-                                     u'%s에게 초대 메세지를 보냈습니다.' % invitation.email
+                                     _('An invitation was sent to %s.') % invitation.email
                                      )
             except:
                 request.user.message_set.create(
-                    message=u'초대하는 과정에서 오류가 있었습니다.'
+                    message=_('There was an error while sending the invitation.')
                 )
             return HttpResponseRedirect('/friend/invite/')
     else:
