@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.template import RequestContext
 from django.utils.translation import gettext as _
 
@@ -24,7 +24,7 @@ def main_page(request):
     variables = RequestContext(request, {
         'shared_bookmarks': shared_bookmarks
     })
-    return render_to_response('main_page.html', variables)
+    return render(request, 'main_page.html', variables)
 
 
 def user_page(request, username):
@@ -54,7 +54,7 @@ def user_page(request, username):
         'show_paginator': paginator.num_pages > 1,
         'is_friend': is_friend,
     })
-    return render_to_response('user_page.html', variables)
+    return render(request, 'user_page.html', variables)
 
 
 def logout_page(request):
@@ -99,7 +99,7 @@ def register_page(request):
     variables = RequestContext(request, {
         'form': form
     })
-    return render_to_response('registration/register.html', variables)
+    return render(request, 'registration/register.html', variables)
 
 
 @login_required(login_url='/login/')
@@ -115,7 +115,7 @@ def bookmark_save_page(request):
                     'show_edit': True,
                     'show_tags': True,
                 })
-                return render_to_response('bookmark_list.html', variables)
+                return render(request, 'bookmark_list.html', variables)
             else:
                 return HttpResponseRedirect(
                     '/user/%s/' % request.user.username
@@ -153,9 +153,9 @@ def bookmark_save_page(request):
         'form': form
     })
     if ajax:
-        return render_to_response('bookmark_save_form.html', variables)
+        return render(request, 'bookmark_save_form.html', variables)
     else:
-        return render_to_response('bookmark_save.html', variables)
+        return render(request, 'bookmark_save.html', variables)
 
 
 def tag_page(request, tag_name):
@@ -168,7 +168,7 @@ def tag_page(request, tag_name):
         'show_user': True,
     })
 
-    return render_to_response('tag_page.html', variables)
+    return render(request, 'tag_page.html', variables)
 
 
 def tag_cloud_page(request):
@@ -194,7 +194,7 @@ def tag_cloud_page(request):
     variables = RequestContext(request, {
         'tags': tags
     })
-    return render_to_response('tag_cloud_page.html', variables)
+    return render(request, 'tag_cloud_page.html', variables)
 
 
 def search_page(request):
@@ -220,9 +220,9 @@ def search_page(request):
         'show_user': True,
     })
     if request.is_ajax():
-        return render_to_response('bookmark_list.html', variables)
+        return render(request, 'bookmark_list.html', variables)
     else:
-        return render_to_response('search.html', variables)
+        return render(request, 'search.html', variables)
 
 
 def _bookmark_save(request, form):
@@ -300,7 +300,7 @@ def popular_page(request):
         'shared_bookmarks': shared_bookmarks
     })
 
-    return render_to_response('popular_page.html', variables)
+    return render(request, 'popular_page.html', variables)
 
 
 def bookmark_page(request, bookmark_id):
@@ -311,7 +311,7 @@ def bookmark_page(request, bookmark_id):
     variables = RequestContext(request, {
         'shared_bookmark': shared_bookmark
     })
-    return render_to_response('bookmark_page.html', variables)
+    return render(request, 'bookmark_page.html', variables)
 
 
 def friends_page(request, username):
@@ -325,7 +325,7 @@ def friends_page(request, username):
         'show_tags': True,
         'show_user': True,
     })
-    return render_to_response('friends_page.html', variables)
+    return render(request, 'friends_page.html', variables)
 
 
 @login_required(login_url='/login/')
@@ -380,7 +380,7 @@ def friend_invite(request):
     variables = RequestContext(request, {
         'form': form
     })
-    return render_to_response('friend_invite.html', variables)
+    return render(request, 'friend_invite.html', variables)
 
 
 def friend_accept(request, code):
